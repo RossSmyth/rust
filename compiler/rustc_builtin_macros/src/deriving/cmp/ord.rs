@@ -1,7 +1,7 @@
 use crate::deriving::generic::ty::*;
 use crate::deriving::generic::*;
 use crate::deriving::path_std;
-use rustc_ast::MetaItem;
+use rustc_ast::{ast::MatchKind, MetaItem};
 use rustc_expand::base::{Annotatable, ExtCtxt};
 use rustc_span::symbol::{sym, Ident};
 use rustc_span::Span;
@@ -70,7 +70,7 @@ pub fn cs_cmp(cx: &mut ExtCtxt<'_>, span: Span, substr: &Substructure<'_>) -> Bl
                 let eq_arm = cx.arm(span, cx.pat_path(span, equal_path.clone()), expr1);
                 let neq_arm =
                     cx.arm(span, cx.pat_ident(span, test_id), cx.expr_ident(span, test_id));
-                cx.expr_match(span, expr2, thin_vec![eq_arm, neq_arm])
+                cx.expr_match(span, expr2, thin_vec![eq_arm, neq_arm], MatchKind::Prefix)
             }
             CsFold::Fieldless => cx.expr_path(equal_path.clone()),
         },

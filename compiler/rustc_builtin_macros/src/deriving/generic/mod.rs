@@ -174,6 +174,7 @@
 //! )
 //! ```
 
+use ast::MatchKind;
 pub use StaticFields::*;
 pub use SubstructureFields::*;
 
@@ -1184,7 +1185,7 @@ impl<'a> MethodDef<'a> {
             selflike_args.truncate(1);
             let match_arg = cx.expr_deref(span, selflike_args.pop().unwrap());
             let match_arms = ThinVec::new();
-            let expr = cx.expr_match(span, match_arg, match_arms);
+            let expr = cx.expr_match(span, match_arg, match_arms, MatchKind::Prefix);
             return BlockOrExpr(ThinVec::new(), Some(expr));
         }
 
@@ -1381,7 +1382,7 @@ impl<'a> MethodDef<'a> {
             } else {
                 cx.expr(span, ast::ExprKind::Tup(selflike_args))
             };
-            cx.expr_match(span, match_arg, match_arms)
+            cx.expr_match(span, match_arg, match_arms, MatchKind::Prefix)
         };
 
         // If the trait uses the tag and there are multiple variants, we need

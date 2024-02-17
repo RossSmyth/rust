@@ -3,6 +3,7 @@ use crate::deriving::generic::*;
 use crate::deriving::path_std;
 
 use ast::EnumDef;
+use ast::MatchKind;
 use rustc_ast::{self as ast, MetaItem};
 use rustc_expand::base::{Annotatable, ExtCtxt};
 use rustc_span::symbol::{sym, Ident, Symbol};
@@ -235,7 +236,7 @@ fn show_fieldless_enum(
             cx.arm(span, pat, cx.expr_str(span, v.ident.name))
         })
         .collect::<ThinVec<_>>();
-    let name = cx.expr_match(span, cx.expr_self(span), arms);
+    let name = cx.expr_match(span, cx.expr_self(span), arms, MatchKind::Prefix);
     let fn_path_write_str = cx.std_path(&[sym::fmt, sym::Formatter, sym::write_str]);
     BlockOrExpr::new_expr(cx.expr_call_global(span, fn_path_write_str, thin_vec![fmt, name]))
 }

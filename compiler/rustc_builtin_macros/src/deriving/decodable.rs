@@ -3,6 +3,7 @@
 use crate::deriving::generic::ty::*;
 use crate::deriving::generic::*;
 use crate::deriving::pathvec_std;
+use ast::MatchKind;
 use rustc_ast::ptr::P;
 use rustc_ast::{self as ast, Expr, MetaItem, Mutability};
 use rustc_expand::base::{Annotatable, ExtCtxt};
@@ -153,7 +154,12 @@ fn decodable_substructure(
 
             let result = cx.expr_ok(
                 trait_span,
-                cx.expr_match(trait_span, cx.expr_ident(trait_span, variant), arms),
+                cx.expr_match(
+                    trait_span,
+                    cx.expr_ident(trait_span, variant),
+                    arms,
+                    MatchKind::Prefix,
+                ),
             );
             let lambda = cx.lambda(trait_span, vec![blkarg, variant], result);
             let variant_array_ref = cx.expr_array_ref(trait_span, variants);

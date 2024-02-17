@@ -1,7 +1,7 @@
 use crate::deriving::generic::ty::*;
 use crate::deriving::generic::*;
 use crate::deriving::{path_std, pathvec_std};
-use rustc_ast::{ExprKind, ItemKind, MetaItem, PatKind};
+use rustc_ast::{ExprKind, ItemKind, MatchKind, MetaItem, PatKind};
 use rustc_expand::base::{Annotatable, ExtCtxt};
 use rustc_span::symbol::{sym, Ident};
 use rustc_span::Span;
@@ -132,7 +132,7 @@ fn cs_partial_cmp(
                 // Reference: https://github.com/rust-lang/rust/pull/103659#issuecomment-1328126354
 
                 if !tag_then_data
-                    && let ExprKind::Match(_, arms) = &mut expr1.kind
+                    && let ExprKind::Match(_, arms, _) = &mut expr1.kind
                     && let Some(last) = arms.last_mut()
                     && let PatKind::Wild = last.pat.kind
                 {
@@ -146,7 +146,7 @@ fn cs_partial_cmp(
                     );
                     let neq_arm =
                         cx.arm(span, cx.pat_ident(span, test_id), cx.expr_ident(span, test_id));
-                    cx.expr_match(span, expr2, thin_vec![eq_arm, neq_arm])
+                    cx.expr_match(span, expr2, thin_vec![eq_arm, neq_arm], MatchKind::Prefix)
                 }
             }
             CsFold::Fieldless => cx.expr_some(span, cx.expr_path(equal_path.clone())),
