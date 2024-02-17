@@ -1,4 +1,5 @@
 use crate::base::ExtCtxt;
+use ast::MatchKind;
 use rustc_ast::ptr::P;
 use rustc_ast::{self as ast, AttrVec, BlockCheckMode, Expr, LocalKind, PatKind, UnOp};
 use rustc_ast::{attr, token, util::literal};
@@ -450,7 +451,7 @@ impl<'a> ExtCtxt<'a> {
         let err_arm = self.arm(sp, err_pat, err_expr);
 
         // `match head { Ok() => ..., Err() => ... }`
-        self.expr_match(sp, head, thin_vec![ok_arm, err_arm])
+        self.expr_match(sp, head, thin_vec![ok_arm, err_arm], MatchKind::Prefix)
     }
 
     pub fn pat(&self, span: Span, kind: PatKind) -> P<ast::Pat> {
@@ -520,8 +521,14 @@ impl<'a> ExtCtxt<'a> {
         self.arm(span, self.pat_wild(span), self.expr_unreachable(span))
     }
 
-    pub fn expr_match(&self, span: Span, arg: P<ast::Expr>, arms: ThinVec<ast::Arm>) -> P<Expr> {
-        self.expr(span, ast::ExprKind::Match(arg, arms))
+    pub fn expr_match(
+        &self,
+        span: Span,
+        arg: P<ast::Expr>,
+        arms: ThinVec<ast::Arm>,
+        kind: MatchKind,
+    ) -> P<Expr> {
+        self.expr(span, ast::ExprKind::Match(arg, arms, kind))
     }
 
     pub fn expr_if(
